@@ -1,0 +1,93 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<h2 class="mb-4">Panel de Administración</h2>
+
+<div class="row mb-4">
+
+    <div class="col-md-4">
+        <div class="card shadow border-0">
+            <div class="card-body">
+                <h6>Total de Productos</h6>
+                <h2>{{ total_productos }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow border-0">
+            <div class="card-body">
+                <h6>Productos con Stock Bajo</h6>
+                <h2 class="text-danger">{{ stock_bajo }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow border-0">
+            <div class="card-body">
+                <h6>Valor Total del Inventario</h6>
+                <h2 class="text-success">${{ "%.2f"|format(valor_total) }}</h2>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<hr>
+
+<h4>Productos con Stock Bajo</h4>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Cantidad</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for producto in stock_bajo_lista %}
+        <tr>
+            <td>{{ producto.nombre }}</td>
+            <td class="text-danger">{{ producto.cantidad }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="2">No hay productos con stock bajo.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<hr>
+
+<h4>Últimos Productos Agregados</h4>
+<table class="table table-sm table-bordered">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Cantidad</th>
+            <th>Precio</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for producto in ultimos %}
+        <tr>
+            <td>{{ producto.nombre }}</td>
+            <td>{{ producto.cantidad }}</td>
+            <td>${{ producto.precio }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="mt-4">
+    <a href="{{ url_for('nuevo_producto') }}" class="btn btn-primary">
+        Agregar Producto
+    </a>
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">
+        Ver Inventario Completo
+    </a>
+</div>
+
+{% endblock %}
