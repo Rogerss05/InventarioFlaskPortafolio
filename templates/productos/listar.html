@@ -16,24 +16,18 @@
     </thead>
     <tbody>
         {% for producto in productos %}
-        <tr class="{% if producto.stock < 5 %}table-warning{% endif %}">
+        <tr class="{% if producto.cantidad < 5 %}table-warning{% endif %}">
             <td>{{ producto.id }}</td>
             <td>{{ producto.nombre }}</td>
-            <td>{{ producto.categoria }}</td>
+            <td>{{ producto.categoria.nombre }}</td>
             <td>${{ producto.precio }}</td>
-            <td>{{ producto.stock }}</td>
+            <td>{{ producto.cantidad }}</td>
             <td>
-                <a href="{{ url_for('editar_producto', id=producto.id) }}" class="btn btn-sm btn-primary">
-                    Editar
-                </a>
+                <a href="{{ url_for('editar_producto', id=producto.id) }}" class="btn btn-sm btn-primary">Editar</a>
 
-                <form action="{{ url_for('eliminar_producto', id=producto.id) }}"
-                      method="POST"
-                      style="display:inline;">
-                    <button class="btn btn-sm btn-danger"
-                            onclick="return confirm('¿Eliminar producto?')">
-                        Eliminar
-                    </button>
+                <form action="{{ url_for('eliminar_producto', id=producto.id) }}" method="POST" style="display:inline;">
+                <button class="btn btn-sm btn-danger"
+                    onclick="return confirm('¿Seguro que deseas eliminar este producto?')">Eliminar</button>
                 </form>
             </td>
         </tr>

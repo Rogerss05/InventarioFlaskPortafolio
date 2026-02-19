@@ -72,12 +72,14 @@ def editar_producto(id):
 
     producto = Producto.query.get_or_404(id)
     form = ProductoForm(obj=producto)
+    form.categoria.choices = [(c.id, c.nombre) for c in Categoria.query.all()]
 
     if form.validate_on_submit():
         producto.nombre = form.nombre.data
         producto.precio = form.precio.data
         producto.cantidad = form.cantidad.data
         producto.descripcion = form.descripcion.data
+        categoria_id=form.categoria.data
         db.session.commit()
         return redirect(url_for("index"))
 
@@ -157,6 +159,16 @@ def dashboard():
         ultimos=ultimos,
         stock_bajo_lista=stock_bajo_lista
     )
+    
+# ------------------------
+# RUTA VER INVENTARIO COMPLETO
+# ------------------------
+
+@app.route("/inventario")
+@login_required
+def inventario():
+    productos = Producto.query.all()
+    return render_template("productos/listar.html", productos=productos)
 
 
 # ------------------------
