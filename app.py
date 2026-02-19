@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, flash
 from config import Config
-from models import db, Producto, User
+from models import Categoria, db, Producto, User
 from forms import ProductoForm, LoginForm
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -42,14 +42,16 @@ def nuevo_producto():
     if current_user.role != "admin":
         flash("No tienes permisos para agregar productos.")
         return redirect(url_for("index"))
-
+    
     form = ProductoForm()
+    form.categoria.choices = [(c.id, c.nombre) for c in Categoria.query.all()]
     if form.validate_on_submit():
         producto = Producto(
             nombre=form.nombre.data,
             precio=form.precio.data,
             cantidad=form.cantidad.data,
-            descripcion=form.descripcion.data
+            descripcion=form.descripcion.data,
+            categoria_id=form.categoria.data
         )
         db.session.add(producto)
         db.session.commit()

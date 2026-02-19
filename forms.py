@@ -1,3 +1,4 @@
+from wtforms import SelectField, validators
 from flask_wtf import FlaskForm
 from wtforms import StringField, FloatField, IntegerField, PasswordField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired, Length
@@ -8,6 +9,7 @@ class ProductoForm(FlaskForm):
     precio = FloatField("Precio", validators=[DataRequired()])
     cantidad = IntegerField("Cantidad", validators=[DataRequired()])
     submit = SubmitField("Guardar")
+    categoria = SelectField("Categoria", coerce=int, validators=[DataRequired()])
 
 class LoginForm(FlaskForm):
     username = StringField("Usuario", validators=[DataRequired()])
