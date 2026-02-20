@@ -1,9 +1,10 @@
-from flask import Flask, render_template, redirect, url_for, flash
+from flask import Flask, render_template, redirect, url_for, flash, request
 from config import Config
 from models import Categoria, db, Producto, User
 from forms import ProductoForm, LoginForm
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy import func
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -27,7 +28,7 @@ def load_user(user_id):
 def index():
     if current_user.role == "admin":
         return redirect(url_for("dashboard"))
-
+    
     productos = Producto.query.all()
     return render_template("productos/listar.html", productos=productos)
 
@@ -150,6 +151,16 @@ def dashboard():
     ).scalar() or 0
 
     ultimos = Producto.query.order_by(Producto.id.desc()).limit(5).all()
+    
+    productos_por_categoria = (
+        db.session.query(Categoria.nombre, func.count(Producto.id))
+        .join(Producto)
+        .group_by(Categoria.nombre)
+        .all()
+    )
+    
+    categorias = [p[0] for p in productos_por_categoria]
+    cantidades = [p[1] for p in productos_por_categoria]
 
     return render_template(
         "dashboard.html",
@@ -157,7 +168,9 @@ def dashboard():
         stock_bajo=stock_bajo,
         valor_total=valor_total,
         ultimos=ultimos,
-        stock_bajo_lista=stock_bajo_lista
+        stock_bajo_lista=stock_bajo_lista,
+        categorias = categorias,
+        cantidades = cantidades
     )
     
 # ------------------------
@@ -167,8 +180,24 @@ def dashboard():
 @app.route("/inventario")
 @login_required
 def inventario():
-    productos = Producto.query.all()
-    return render_template("productos/listar.html", productos=productos)
+    busqueda = request.args.get("busqueda")
+    categoria_id = request.args.get("categoria")
+    stock_bajo = request.args.get("stock_bajo")
+    query = Producto.query
+    
+    if busqueda:
+        query = query.filter(Producto.nombre.contains(busqueda))
+    
+    if categoria_id:
+        query = query.filter(Producto.categoria_id == categoria_id)
+    
+    if stock_bajo:
+        query = query.filter(Producto.cantidad < 5)
+        
+    productos = query.all()
+    categorias = Categoria.query.all()
+    
+    return render_template("productos/listar.html", productos=productos, categorias=categorias)
 
 
 # ------------------------

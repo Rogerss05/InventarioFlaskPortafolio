@@ -35,6 +35,8 @@
 
 </div>
 
+
+
 <hr>
 
 <h4>Productos con Stock Bajo</h4>
@@ -80,6 +82,42 @@
         {% endfor %}
     </tbody>
 </table>
+
+<hr>
+
+<h4>Productos por Categoría</h4>
+
+<div class="card shadow-sm p-3 mb-4">
+    <canvas id="graficaCategorias"></canvas>
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script id="datos-grafica" type="application/json">
+    {
+        "categorias": {{ categorias | tojson }},
+        "cantidades": {{ cantidades | tojson }}
+    }
+</script>
+
+<script>
+    const datos = JSON.parse(document.getElementById('datos-grafica').textContent);
+
+    const ctx = document.getElementById('graficaCategorias');
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: datos.categorias,
+            datasets: [{
+                label: 'Productos por categoría',
+                data: datos.cantidades
+            }]
+        }
+    });
+</script>
 
 <div class="mt-4">
     <a href="{{ url_for('nuevo_producto') }}" class="btn btn-primary">
